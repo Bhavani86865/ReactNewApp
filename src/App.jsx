@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { calculate } from './math.js'
 import './App.css'
 
 function App() {
@@ -7,22 +8,15 @@ function App() {
   const [operator, setOperator] = useState(null)
   const [waitingForOperand, setWaitingForOperand] = useState(false)
 
-  const calculate = (firstValue, secondValue, op) => {
-    switch (op) {
-      case '+':
-        return firstValue + secondValue
-      case '-':
-        return firstValue - secondValue
-      case '*':
-        return firstValue * secondValue
-      case '/':
-        return secondValue === 0 ? 'Error' : firstValue / secondValue
-      default:
-        return secondValue
-    }
-  }
-
   const inputDigit = (digit) => {
+    if (display === 'Error') {
+      setDisplay(String(digit))
+      setPreviousValue(null)
+      setOperator(null)
+      setWaitingForOperand(false)
+      return
+    }
+
     if (waitingForOperand) {
       setDisplay(String(digit))
       setWaitingForOperand(false)
@@ -33,6 +27,14 @@ function App() {
   }
 
   const inputDecimal = () => {
+    if (display === 'Error') {
+      setDisplay('0.')
+      setPreviousValue(null)
+      setOperator(null)
+      setWaitingForOperand(false)
+      return
+    }
+
     if (waitingForOperand) {
       setDisplay('0.')
       setWaitingForOperand(false)
@@ -52,6 +54,11 @@ function App() {
   }
 
   const deleteLastDigit = () => {
+    if (display === 'Error') {
+      clearCalculator()
+      return
+    }
+
     if (waitingForOperand) {
       setWaitingForOperand(false)
       return
@@ -66,6 +73,13 @@ function App() {
   }
 
   const selectOperator = (nextOperator) => {
+    if (display === 'Error') {
+      setPreviousValue(null)
+      setOperator(null)
+      setWaitingForOperand(false)
+      return
+    }
+
     const inputValue = Number(display)
 
     if (previousValue === null) {
@@ -81,7 +95,7 @@ function App() {
   }
 
   const evaluate = () => {
-    if (operator === null || previousValue === null) {
+    if (operator === null || previousValue === null || display === 'Error') {
       return
     }
 
